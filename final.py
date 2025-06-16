@@ -14,8 +14,8 @@ gemini_model = genai.GenerativeModel('models/gemini-1.5-pro-latest')
 @st.cache_resource
 def load_resources():
     model = SentenceTransformer("all-MiniLM-L6-v2")
-    index = faiss.read_index("rti_faiss.index")
-    with open("rti_sections.pkl", "rb") as f:
+    index = faiss.read_index("./Acts/Right To Information Act,2005/Right To Information Act,2005.index")
+    with open("./Acts/Right To Information Act,2005/Right To Information Act,2005.pkl", "rb") as f:
         sections = pickle.load(f)
     return model,index,sections
 model,index,sections=load_resources()
@@ -34,7 +34,7 @@ You are a legal assistant. Based on the following sections of the RTI Act, answe
 
 Question: {query}
 
-Relevant Sections:
+Relevant Section
 {context}
 
 Answer:
