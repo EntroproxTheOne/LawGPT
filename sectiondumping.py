@@ -1,9 +1,19 @@
 import json
 import os
-
-
+FILENAME="./Acts/Right To Information Act,2005/Right To Information Act,2005.json"
 def get_input():
-    section = input("Enter Section Number (e.g. Section 6): ").strip()
+    type_input = input("Type (s = Section, h = Schedule): ").strip().lower()
+    if type_input == "s":
+        entry_type = "section"
+        key_label = "Section"
+    elif type_input == "h":
+        entry_type = "schedule"
+        key_label = "Schedule"
+    else:
+        print("❌ Invalid type. Use 's' for Section or 'h' for Schedule.")
+        return None
+
+    number = input(f"Enter {key_label} Number (e.g. Section 6 or Schedule I): ").strip()
     title = input("Enter Title: ").strip()
     print("Enter Text (finish with a blank line):")
 
@@ -14,17 +24,19 @@ def get_input():
             break
         lines.append(line.strip())
 
-    # Join all lines into one clean single-line string
     text = " ".join(lines)
 
     return {
-        "section": section,
+        entry_type: number,
         "title": title,
-        "text": text
+        "text": text,
+        "type": entry_type
     }
 
+def add_to_json_file(data, filename=FILENAME):  # You can rename this per act
+    if data is None:
+        return
 
-def add_to_json_file(data, filename="Right To Information Act,2025.json"):  # Change the filename to act name
     if os.path.exists(filename):
         with open(filename, 'r', encoding='utf-8') as file:
             try:
@@ -39,10 +51,9 @@ def add_to_json_file(data, filename="Right To Information Act,2025.json"):  # Ch
     with open(filename, 'w', encoding='utf-8') as file:
         json.dump(existing_data, file, indent=2, ensure_ascii=False)
 
-    print(f"✅ Section '{data['section']}' added to {filename}")
+    print(f"✅ {data['type'].capitalize()} '{data[data['type']]}' added to {filename}")
 
 
 if __name__ == "__main__":
-    new_section = get_input()
-    add_to_json_file(new_section)
-#Run the program using cmd for faster data entry
+    new_entry = get_input()
+    add_to_json_file(new_entry)
