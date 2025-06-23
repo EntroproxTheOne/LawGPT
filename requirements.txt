@@ -2,4 +2,3 @@ sentence_transformers
 faiss-cpu
 google.generativeai
 streamlit
-python-dotenv
