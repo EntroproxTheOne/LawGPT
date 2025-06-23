@@ -1,6 +1,6 @@
 import json
 import os
-FILENAME="./Acts/Right To Information Act,2005/Right To Information Act,2005.json"
+FILENAME="./Acts/Code of Civil Procedure,1908/Code of Civil Procedure,1908.json"
 def get_input():
     type_input = input("Type (s = Section, h = Schedule): ").strip().lower()
     if type_input == "s":
