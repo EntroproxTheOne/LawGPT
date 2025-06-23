@@ -4,8 +4,34 @@ import pickle
 import google.generativeai as genai
 import streamlit as st
 
+
 st.set_page_config(page_title="Legal Assistant")
-st.title("RTI Legal Assistant")
+st.title("Legal Assistant")
+
+st.markdown("""
+    <style>
+    .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #0e1117;
+        color: gray;
+        text-align: center;
+        padding: 10px;
+        font-size: 0.9rem;
+        z-index: 100;
+        border-top: 1px solid #333;
+    }
+    .footer a {
+        color: #3399ff;
+        text-decoration: none;
+    }
+    .footer a:hover {
+        text-decoration: underline;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 GEMINI_API_KEY = "AIzaSyAc_IaJ5dTGKL6VOjpPQK1gX7CjiPiNnrw"
 genai.configure(api_key=GEMINI_API_KEY)
@@ -65,3 +91,8 @@ if query:
             st.chat_message("user").markdown(msg)
         else:
             st.chat_message("assistant").markdown(msg)
+st.markdown("""
+    <div class="footer">
+        Created by <a href="https://github.com/DeepRulz" target="_blank">Deep Shah</a> and <a href="https://github.com/Rihaan-Shaikh" target="_blank">Rihaan Shaikh</a>
+    </div>
+""", unsafe_allow_html=True)
