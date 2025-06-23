@@ -10,15 +10,20 @@ st.title("RTI Legal Assistant")
 GEMINI_API_KEY = "AIzaSyAc_IaJ5dTGKL6VOjpPQK1gX7CjiPiNnrw"
 genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel('models/gemini-1.5-pro-latest')
+act_choice = st.selectbox("📚 Choose a Law", ["Right To Information Act,2005", "Code of Civil Procedure,1908"])
 
 @st.cache_resource
-def load_resources():
+def load_resources(act_name):
     model = SentenceTransformer("all-MiniLM-L6-v2")
-    index = faiss.read_index("./Acts/Right To Information Act,2005/Right To Information Act,2005.index")
-    with open("./Acts/Right To Information Act,2005/Right To Information Act,2005.pkl", "rb") as f:
+    index_path = f"./Acts/{act_name}/{act_name}.index"
+    pkl_path = f"./Acts/{act_name}/{act_name}.pkl"
+
+    index = faiss.read_index(index_path)
+    with open(pkl_path, "rb") as f:
         sections = pickle.load(f)
-    return model,index,sections
-model,index,sections=load_resources()
+
+    return model,index, sections
+model,index,sections=load_resources(act_choice)
 
 def search_faiss(query, k=7):
     query_vec = model.encode([query]).astype("float32")
@@ -30,7 +35,7 @@ def search_faiss(query, k=7):
 def ask_gemini(query, sections):
     context = "\n\n".join([f"Section {s['section']} - {s['title']}\n{s['text']}" for s in sections])
     prompt = f"""
-You are a legal assistant. Based on the following sections of the RTI Act, answer the question clearly and concisely.
+You are a legal assistant. Based on the following sections of the {act_choice} Act, answer the question clearly and concisely.
 
 Question: {query}
 
