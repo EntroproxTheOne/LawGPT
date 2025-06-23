@@ -4,7 +4,6 @@ import pickle
 import google.generativeai as genai
 import streamlit as st
 
-
 st.set_page_config(page_title="Legal Assistant")
 st.title("Legal Assistant")
 
@@ -38,6 +37,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel('models/gemini-1.5-pro-latest')
 act_choice = st.selectbox("📚 Choose a Law", ["Right To Information Act,2005", "Code of Civil Procedure,1908"])
 
+
 @st.cache_resource
 def load_resources(act_name):
     model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -48,8 +48,11 @@ def load_resources(act_name):
     with open(pkl_path, "rb") as f:
         sections = pickle.load(f)
 
-    return model,index, sections
-model,index,sections=load_resources(act_choice)
+    return model, index, sections
+
+
+model, index, sections = load_resources(act_choice)
+
 
 def search_faiss(query, k=7):
     query_vec = model.encode([query]).astype("float32")
@@ -76,14 +79,15 @@ Answer:
     except Exception as e:
         return f"❌ Error from Gemini: {e}"
 
+
 if "chat" not in st.session_state:
     st.session_state.chat = []
 
-query=st.chat_input("Ask You Question")
+query = st.chat_input("Ask You Question")
 if query:
     st.session_state.chat.append(("user", query))  # Save user message
     with st.spinner("Searching legal knowledge base..."):
-        top_sections= search_faiss(query)
+        top_sections = search_faiss(query)
         answer = ask_gemini(query, top_sections)
     st.session_state.chat.append(("ai", answer))
     for role, msg in st.session_state.chat:
