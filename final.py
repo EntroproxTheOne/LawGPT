@@ -3,7 +3,7 @@ import faiss
 import pickle
 import google.generativeai as genai
 import streamlit as st
-
+import time
 st.set_page_config(page_title="Legal Assistant")
 st.title("Legal Assistant")
 
@@ -31,7 +31,7 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-
+footer_container=st.container()
 GEMINI_API_KEY = "AIzaSyAc_IaJ5dTGKL6VOjpPQK1gX7CjiPiNnrw"
 genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel('models/gemini-1.5-pro-latest')
@@ -75,28 +75,57 @@ Answer:
 """
     try:
         response = gemini_model.generate_content(prompt)
-        return response.text.strip()
+        return response.text
     except Exception as e:
         return f"❌ Error from Gemini: {e}"
+
+def stream_text_animation(text_placeholder, text_content):
+    displayed_text = ""
+    for char in text_content:
+        displayed_text += char
+        answer_html = f"""
+        <div class='answer-box'>
+            <p>{displayed_text}</p>
+        </div>
+        """
+        text_placeholder.markdown(answer_html, unsafe_allow_html=True)
+        time.sleep(0.01)
 
 
 if "chat" not in st.session_state:
     st.session_state.chat = []
-
+for i, (role, msg) in enumerate(st.session_state.chat):
+    with st.chat_message(role):
+        st.markdown(msg)
 query = st.chat_input("Ask You Question")
+with footer_container:
+    st.markdown("""
+        <div class="footer">
+            Created by <a href="https://www.linkedin.com/in/deepshah2712/" target="_blank">Deep Shah</a> and
+            <a href="https://www.linkedin.com/in/rihaan-r-shaikh/" target="_blank">Rihaan Shaikh</a>
+        </div>
+    """, unsafe_allow_html=True)
 if query:
-    st.session_state.chat.append(("user", query))  # Save user message
+    with footer_container:
+        st.markdown("""
+            <div class="footer">
+                Created by <a href="https://www.linkedin.com/in/deepshah2712/" target="_blank">Deep Shah</a> and
+                <a href="https://www.linkedin.com/in/rihaan-r-shaikh/" target="_blank">Rihaan Shaikh</a>
+            </div>
+        """, unsafe_allow_html=True)
+
+    st.chat_message("user").markdown(query)
+    st.session_state.chat.append(("user", query))
+
     with st.spinner("Searching legal knowledge base..."):
         top_sections = search_faiss(query)
-        answer = ask_gemini(query, top_sections)
-    st.session_state.chat.append(("ai", answer))
-    for role, msg in st.session_state.chat:
-        if role == "user":
-            st.chat_message("user").markdown(msg)
-        else:
-            st.chat_message("assistant").markdown(msg)
-st.markdown("""
-    <div class="footer">
-        Created by <a href="https://github.com/DeepRulz" target="_blank">Deep Shah</a> and <a href="https://github.com/Rihaan-Shaikh" target="_blank">Rihaan Shaikh</a>
-    </div>
-""", unsafe_allow_html=True)
+
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ask_gemini(query, top_sections)
+        stream_text_animation(message_placeholder,full_response)
+
+    st.session_state.chat.append(("ai", full_response))
+
+
+
