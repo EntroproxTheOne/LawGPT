@@ -5,7 +5,7 @@ from sentence_transformers import SentenceTransformer
 import pickle
 
 # === Load legal data from JSON ===
-act_name = "Code of Civil Procedure,1908"
+act_name = "Consumer Protection Act,2019"
 act_path = f"./Acts/{act_name}/"
 with open(f"{act_path}{act_name}.json", "r", encoding="utf-8") as f:
     data = json.load(f)
