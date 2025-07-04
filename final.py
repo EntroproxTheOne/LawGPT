@@ -32,7 +32,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 footer_container=st.container()
-GEMINI_API_KEY = "AIzaSyD45DJqqOCQk0wcrhUn67etnKCrf8B1wQ0"
+GEMINI_API_KEY = "AIzaSyCkqjq3kcD9_h3Un5gl6RfPrtHCeDDYGX0"
 genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel('models/gemini-1.5-pro-latest')
 act_choice = st.selectbox("📚 Choose a Law", ["Right To Information Act,2005", "Code of Civil Procedure,1908","Consumer Protection Act,2019"])
