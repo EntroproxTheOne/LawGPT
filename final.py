@@ -1,7 +1,8 @@
 from sentence_transformers import SentenceTransformer
+from together import Together
+import os
 import faiss
 import pickle
-import google.generativeai as genai
 import streamlit as st
 import time
 st.set_page_config(page_title="Legal Assistant")
@@ -32,9 +33,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 footer_container=st.container()
-GEMINI_API_KEY = "AIzaSyCkqjq3kcD9_h3Un5gl6RfPrtHCeDDYGX0"
-genai.configure(api_key=GEMINI_API_KEY)
-gemini_model = genai.GenerativeModel('models/gemini-1.5-pro-latest')
+TOGETHER_API_KEY = st.secrets["together_api_key"]  # store this in Streamlit secrets
+together = Together(api_key=TOGETHER_API_KEY)
 act_choice = st.selectbox("📚 Choose a Law", ["Right To Information Act,2005", "Code of Civil Procedure,1908","Consumer Protection Act,2019"])
 
 
@@ -61,23 +61,32 @@ def search_faiss(query, k=7):
     return results
 
 
-def ask_gemini(query, sections):
+def ask_llama(query, sections):
     context = "\n\n".join([f"Section {s['section']} - {s['title']}\n{s['text']}" for s in sections])
     prompt = f"""
 You are a legal assistant. Based on the following sections of the {act_choice} Act, answer the question clearly and concisely.
 
 Question: {query}
 
-Relevant Section
+Relevant Sections:
 {context}
 
 Answer:
 """
     try:
-        response = gemini_model.generate_content(prompt)
-        return response.text
+        response = together.chat.completions.create(
+            model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+            messages=[
+                {"role": "system", "content": "You are a helpful legal assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=1024,
+        )
+        return response.choices[0].message.content.strip()
     except Exception as e:
-        return f"❌ Error from Gemini: {e}"
+        return f"❌ Error from LLaMA API: {e}"
+
 
 def stream_text_animation(text_placeholder, text_content):
     displayed_text = ""
@@ -122,7 +131,7 @@ if query:
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        full_response = ask_gemini(query, top_sections)
+        full_response = ask_llama(query, top_sections)
         stream_text_animation(message_placeholder,full_response)
 
     st.session_state.chat.append(("ai", full_response))
