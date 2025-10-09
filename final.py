@@ -110,8 +110,7 @@ query = st.chat_input("Ask You Question")
 with footer_container:
     st.markdown("""
         <div class="footer">
-            Created by <a href="https://www.linkedin.com/in/deepshah2712/" target="_blank">Deep Shah</a> and
-            <a href="https://www.linkedin.com/in/rihaan-r-shaikh/" target="_blank">Rihaan Shaikh</a>
+            Created by <a href="https://www.linkedin.com/in/deepshah2712/" target="_blank">Deep Shah</a>
         </div>
     """, unsafe_allow_html=True)
 if query:
